@@ -4,6 +4,15 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var flash = require('connect-flash');
+var session = require('express-session');
+
+// New Code for db
+var mongo = require('mongodb');
+var monk = require('monk');
+var db = monk('localhost:27017/nodetest1');
+
+
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -14,15 +23,31 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+
+// Make our db accessible to our router
+app.use(function(req,res,next){
+    req.db = db;
+    next();
+});
+
+//flash
+app.use(cookieParser('secret'));
+app.use(session({cookie: { maxAge: 60000 }}));
+app.use(flash());
+
 app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
-app.use(cookieParser());
+//app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'bower_components/bootstrap/dist/')));
 app.use('/', routes);
-app.use('/user', users);
+app.use('/users', users);
+
+
+
+
 
 
 /// catch 404 and forwarding to error handler
@@ -58,3 +83,25 @@ app.use(function(err, req, res, next) {
 
 
 module.exports = app;
+
+
+//mongodb
+// var MongoStore = require('connect-mongo');
+// var settings = require('./settings');
+// app.configure(function(){
+//   app.set('views',__dirname + '/views');
+//   app.set('view engine', 'ejs');
+//   app.use(express.bodyParser());
+//   app.use(express.methodOverride());
+//   app.use(express.cookieParser());
+//   app.use(express.session({
+//     secret: settings.cookieSecret,
+//     store: new MongoStore({
+//       db:settings.db
+//     })
+//   }));
+//   app.use(express.router(routes));
+//   //modify
+//   //app.use(app.router);
+//   app.use(express.static(__dirname + '/public'));
+// });

@@ -2,12 +2,43 @@ var express = require('express');
 var router = express.Router();
 var brand = 'Bootstrap for Jade';
 var users = {
-  
+
 'byvoid':{name:'Carbo',
       website:'http://www.byvoid.com'
 }
 
 };
+/* testMongo */
+router.get('/userlist', function(req, res){
+  var db = req.db;
+  var collection = db.get('usercollection');
+  collection.find({},{},function(e,docs){
+    res.render('userlist', {
+      "userlist" : docs
+    });
+  });
+});
+router.get('/newuser', function(req, res){
+  res.render('newuser',{title:'Add New User'});
+});
+router.post('/adduser', function(req, res){
+  var db = req.db;
+  var userName = req.body.username;
+  var userEmail = req.body.useremail;
+  var collection = db.get('usercollection');
+  collection.insert({
+    "username":userName,
+    "email":userEmail
+  },function(err, doc){
+    if(err){
+      res.send("there was a problem adding the information to the database. ");
+    }
+    else{
+      res.location("userlist");
+      res.redirect("userlist");
+    }
+  });
+});
 /* microblog */
 router.get('/u/:user', function(req, res){
   res.send('user');
@@ -18,11 +49,45 @@ router.post('/post', function(req, res){
   console.log('post');
 });
 router.get('/reg', function(req, res){
-  res.send('reg get');
+  //res.send('reg get');
+  res.render('reg',{
+    title:'user register',
+  });
   console.log('reg get');
 });
 router.post('/reg', function(req, res){
-  res.send('reg post');
+  //res.send('reg post');
+  //check repaet password
+  if(req.body['password-repeat']!= req.body['password']){
+    req.flash('error','different password');
+    return res.redirect('/reg');
+  }else{
+    res.send('reg post');
+  }
+
+  var newUser = new User({
+    name: req.body.username,
+    password: password,
+  });
+
+  User.get(newUser.name, function(err, user){
+    if(user)
+      err = 'Username already exists.';
+    if(err){
+      req.flash('error', err);
+      return res.redirect('/reg');
+    }
+
+    newUser.save(function(err){
+      if(err){
+        req.flash('error', err);
+        return res.redirect('req');
+      }
+      req.session.user = newUser;
+      req.flash('success', 'register success');
+      res.redirect('/');
+    });
+  });
   console.log('reg post');
 });
 router.get('/login', function(req, res){
@@ -68,7 +133,5 @@ router.get('/user/:username', function(req, res){
 router.put('/user/:username', function(req, res){
   res.send('Done');
 });
+
 module.exports = router;
-
-
-

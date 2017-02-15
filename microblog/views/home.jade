@@ -1,24 +1,34 @@
 extends layout
 
 block content
-  .hero-unit
-    h1 Welcome to microblog
-    p Microblog is a Nodejs based microblog system
-    p
-      a.btn.btn-primary.btn-large(href="/login") Login
-      a.btn.btn-primary.btn-large(href="/reg") Register Now
-  .row
-    .span4
-      h2 Carbo says
-        p Carbo
-    .span4
-      h2 BYVoid says
-        p ByVoid
-    .span4
-      h2  eee says
-        p Hello
-
-  div.container
-    div.jumbotron
+  .container
+    .jumbotron
       h1= title
       p Welcome to #{title}
+      p
+        a.btn.btn-primary.btn-large(href="/login") Login
+        a.btn.btn-primary.btn-large(href="/reg") Register Now
+    .row-fluid
+      .span4
+        h2 Carbo says
+          p 
+            |Carbo
+          p 
+            a.btn(href='#') View details »
+      .span4
+        h2 BYVoid says
+          p ByVoid
+      .span4
+        h2  eee says
+          p Hello
+    hr
+
+
+
+
+
+//  .hero-unit
+//    h1 Welcome to microblog
+//    p Microblog is a Nodejs based microblog system
+
+
